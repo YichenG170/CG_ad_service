@@ -4,31 +4,6 @@
 
 Production-ready ad service with Google AdSense/AdMob integration, comprehensive tracking, and modern tooling.
 
-## 🚀 Quick Start
-
-### ⚡ 最快测试方法（30秒）
-
-```powershell
-# 1. 进入目录
-cd "C:\Users\31339\Desktop\Nanyang Technological University\Entrepreneurship\CG_ad_service"
-
-# 2. 安装依赖（首次运行）
-npm install
-
-# 3. 启动服务器
-npm run dev
-
-# 4. 打开新 PowerShell 窗口，运行测试
-powershell -ExecutionPolicy Bypass -File .\scripts\test-api.ps1
-
-# 5. 在浏览器中查看演示
-Start-Process "http://localhost:8791/demo/demo.html"
-```
-
-**就这么简单！** 🎉 服务器现在运行在 http://localhost:8791
-
----
-
 ### Option 1: Mock Mode (No Google Ads Setup Required) ⚡
 
 Perfect for development and testing **without** Google Ads credentials:
