@@ -4,6 +4,10 @@
 
 Production-ready ad service with Google AdSense/AdMob integration, comprehensive tracking, and modern tooling.
 
+## 🚀 Quick Start
+
+👉 **See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions**
+
 ### Option 1: Mock Mode (No Google Ads Setup Required) ⚡
 
 Perfect for development and testing **without** Google Ads credentials:
@@ -19,23 +23,14 @@ cp .env.example .env
 # 3. Validate configuration
 npm run validate
 
-# 4. Start server (in background)
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PWD'; npm run dev"
-
-# Wait for server to start
-Start-Sleep -Seconds 5
+# 4. Start server
+npm run dev
 
 # 5. Test the server
 powershell -ExecutionPolicy Bypass -File .\scripts\test-api.ps1
 
 # 6. Open demo page in browser
 Start-Process "http://localhost:8791/demo/demo.html"
-```
-
-**Quick Test (One-liner)**:
-```powershell
-# Start server and test in one command
-npm run dev & Start-Sleep 5; powershell .\scripts\test-api.ps1
 ```
 
 **Mock mode features:**
@@ -49,6 +44,19 @@ npm run dev & Start-Sleep 5; powershell .\scripts\test-api.ps1
 For production or testing with actual Google AdSense:
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your Google Ads credentials
+
+# 3. Validate configuration
+npm run validate
+
+# 4. Start server
+npm start
+```
 # 1. Install dependencies
 npm install
 
@@ -270,57 +278,55 @@ Generate test token:
 npm run generate-jwt
 ```
 
-## 🧪 测试服务器
+## 🧪 Testing
 
-### 方法 1: 自动化测试脚本（推荐）✨
+### Automated Testing (Recommended) ✨
 
 ```powershell
-# 1. 启动服务器
+# 1. Start the server
 npm run dev
 
-# 2. 打开新的 PowerShell 窗口，运行测试
+# 2. In a new PowerShell window, run tests
 powershell -ExecutionPolicy Bypass -File .\scripts\test-api.ps1
 ```
 
-测试脚本会自动检查：
-- ✅ 健康检查 API
-- ✅ AdSense 配置获取
-- ✅ 广告请求（Banner 和 Rectangle）
-- ✅ 点击追踪
-- ✅ 显示测试结果统计
+The test script automatically checks:
+- ✅ Health check API
+- ✅ AdSense configuration
+- ✅ Ad requests (Banner and Rectangle)
+- ✅ Click tracking
+- ✅ Test results summary
 
-### 方法 2: 手动测试
+### Manual Testing
 
-#### A. 启动服务器
+#### A. Start the Server
 ```powershell
-# 在当前 PowerShell 窗口启动
-cd "C:\Users\31339\Desktop\Nanyang Technological University\Entrepreneurship\CG_ad_service"
 npm run dev
 
-# 服务器启动后，你会看到：
+# You should see:
 # [INFO] 🚀 Ad Service started successfully
 # [INFO] 📍 Server running at: http://localhost:8791
 # [INFO] 🎭 Mock mode: Enabled
 ```
 
-#### B. 在浏览器中测试
-打开以下链接：
-- **主页**: http://localhost:8791
-- **演示页面**: http://localhost:8791/demo/demo.html
-- **健康检查**: http://localhost:8791/api/ads/health
+#### B. Test in Browser
+Open these URLs:
+- **Home**: http://localhost:8791
+- **Demo Page**: http://localhost:8791/demo/demo.html
+- **Health Check**: http://localhost:8791/api/ads/health
 
-#### C. 使用 PowerShell 测试 API
+#### C. Test with PowerShell
 
 ```powershell
-# 打开新的 PowerShell 窗口，测试 API
+# Open a new PowerShell window and test the API
 
-# 1. 健康检查
+# 1. Health check
 Invoke-RestMethod -Uri "http://localhost:8791/api/ads/health"
 
-# 2. 获取 AdSense 配置
+# 2. Get AdSense configuration
 Invoke-RestMethod -Uri "http://localhost:8791/api/ads/config"
 
-# 3. 请求广告
+# 3. Request an ad
 $body = @{
     page = "/test"
     format = "banner"
@@ -333,7 +339,7 @@ Invoke-RestMethod -Uri "http://localhost:8791/api/ads/request" `
     -ContentType "application/json" `
     -Body $body
 
-# 4. 追踪点击
+# 4. Track a click
 $clickBody = @{
     impressionId = "mock_imp_123456_test"
     clickUrl = "https://example.com"
@@ -344,49 +350,24 @@ Invoke-RestMethod -Uri "http://localhost:8791/api/ads/click" `
     -ContentType "application/json" `
     -Body $clickBody
 
-# 5. 获取统计（需要 JWT）
-# 先生成 JWT token
+# 5. Get metrics (requires JWT)
+# First generate JWT token
 npm run generate-jwt
-# 复制输出的 token，然后：
-$token = "你的JWT_TOKEN"
+# Copy the token, then:
+$token = "YOUR_JWT_TOKEN"
 $headers = @{ Authorization = "Bearer $token" }
 Invoke-RestMethod -Uri "http://localhost:8791/api/ads/metrics?adUnitId=test&startDate=2025-01-01&endDate=2025-12-31" -Headers $headers
 ```
 
-### 方法 3: 完整测试流程（一步到位）
+### Stop the Server
 
 ```powershell
-# 创建测试脚本并运行
-cd "C:\Users\31339\Desktop\Nanyang Technological University\Entrepreneurship\CG_ad_service"
+# Method 1: Press Ctrl+C in the terminal running npm run dev
 
-# 确保配置正确
-npm run validate
-
-# 启动服务器（后台运行）
-Start-Job -ScriptBlock { 
-    cd "C:\Users\31339\Desktop\Nanyang Technological University\Entrepreneurship\CG_ad_service"
-    npm run dev 
-}
-
-# 等待服务器启动
-Start-Sleep -Seconds 5
-
-# 运行测试
-powershell -ExecutionPolicy Bypass -File .\scripts\test-api.ps1
-
-# 打开演示页面
-Start-Process "http://localhost:8791/demo/demo.html"
-```
-
-### 停止服务器
-
-```powershell
-# 方法 1: 在运行 npm run dev 的窗口按 Ctrl+C
-
-# 方法 2: 使用脚本停止
+# Method 2: Use the script
 npm run kill-server
 
-# 方法 3: 手动查找并停止进程
+# Method 3: Manually stop process
 Get-Process -Name node | Where-Object { $_.Path -like "*CG_ad_service*" } | Stop-Process -Force
 ```
 

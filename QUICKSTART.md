@@ -1,4 +1,210 @@
-# ClassGuru Ad Service - 快速启动指南
+# Quick Start Guide - ClassGuru Ad Service
+
+Get started with the ClassGuru Ad Service in 5 minutes.
+
+## 📦 Installation
+
+### Step 1: Install Dependencies
+
+```powershell
+npm install
+```
+
+### Step 2: Configure Environment
+
+```powershell
+# Copy the environment template
+cp .env.example .env
+
+# Edit .env file with your preferred editor
+notepad .env  # or code .env for VS Code
+```
+
+**Minimum Configuration (Mock Mode)**:
+```env
+PORT=8791
+JWT_SECRET=your_jwt_secret_at_least_32_characters_long_here
+DB_PATH=./data/ad_service.db
+MOCK_ADS_MODE=true
+MOCK_ADS_SCENARIO=success
+```
+
+### Step 3: Validate Configuration
+
+```powershell
+npm run validate
+```
+
+### Step 4: Start the Service
+
+**Development Mode (Recommended)**:
+```powershell
+npm run dev
+```
+
+**Production Mode**:
+```powershell
+npm start
+```
+
+### Step 5: Test the Service
+
+Open in your browser:
+- **Home**: http://localhost:8791
+- **Demo Page**: http://localhost:8791/demo/demo.html
+- **Health Check**: http://localhost:8791/api/ads/health
+
+---
+
+## 🎯 Common Commands
+
+```powershell
+# View all available commands
+make help
+
+# Validate environment configuration
+npm run validate
+
+# Generate test JWT token
+npm run generate-jwt
+
+# Stop the server
+npm run kill-server
+
+# Clean database
+make clean
+```
+
+---
+
+## 🧪 Testing
+
+### Automated Tests
+
+```powershell
+# In Terminal 1: Start the server
+npm run dev
+
+# In Terminal 2: Run tests
+powershell -ExecutionPolicy Bypass -File .\scripts\test-api.ps1
+```
+
+### Manual API Testing
+
+```powershell
+# Health check
+Invoke-RestMethod -Uri "http://localhost:8791/api/ads/health"
+
+# Request an ad
+$body = @{
+    page = "/test"
+    format = "banner"
+    sessionId = "test-123"
+    deviceType = "desktop"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8791/api/ads/request" `
+    -Method POST `
+    -ContentType "application/json" `
+    -Body $body
+```
+
+---
+
+## 🔄 Development Workflow
+
+1. **Start development server**
+   ```powershell
+   npm run dev
+   ```
+
+2. **Test in browser**
+   - Open http://localhost:8791/demo/demo.html
+   - Click "Load Ad" to see ad display
+   - View statistics and activity log
+
+3. **Make code changes**
+   - Server auto-restarts (hot reload)
+   - Refresh browser to see changes
+
+4. **Stop the server**
+   - Press `Ctrl+C` in the terminal
+   - Or run `npm run kill-server`
+
+---
+
+## 📝 Next Steps
+
+### Integrate Google AdSense (Production)
+
+1. **Register for Google AdSense**
+   - Visit https://www.google.com/adsense
+   - Create account and submit site for review
+
+2. **Get Credentials**
+   - Create ad units in AdSense dashboard
+   - Copy Client ID (ca-pub-xxxxxxxxx)
+   - Copy Slot ID
+
+3. **Update .env**
+   ```env
+   MOCK_ADS_MODE=false
+   GOOGLE_ADS_ENABLED=true
+   ADSENSE_CLIENT_ID=ca-pub-xxxxxxxxxxxxxxxxx
+   ADSENSE_SLOT_ID=xxxxxxxxxx
+   ```
+
+4. **Restart Server**
+   ```powershell
+   npm run kill-server
+   npm run dev
+   ```
+
+### Integrate with Payment Service
+
+1. **Ensure JWT_SECRET matches**
+   - Ad Service and Payment Service must use the same `JWT_SECRET`
+   - This enables user authentication across services
+
+2. **Future Features**
+   - Verify user subscription status
+   - Hide ads for premium users
+   - Ad revenue analytics
+   - User behavior analysis
+
+---
+
+## 🐛 Troubleshooting
+
+### Port Already in Use
+```powershell
+npm run kill-server
+```
+
+### TypeScript Errors
+```powershell
+# Reinstall dependencies
+Remove-Item -Recurse -Force node_modules
+npm install
+```
+
+### Database Errors
+```powershell
+# Clean and recreate database
+make clean
+npm run dev
+```
+
+---
+
+## 📚 More Resources
+
+- **Full Documentation**: [README.md](README.md)
+- **Google AdSense Help**: https://support.google.com/adsense
+
+---
+
+**Need Help?** Check server logs or browser console for detailed error messages.
 
 ## 📦 安装步骤
 
