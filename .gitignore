@@ -43,3 +43,7 @@ coverage/
 .cache/
 temp/
 tmp/
+
+# frp client
+frp/
+frp.zip

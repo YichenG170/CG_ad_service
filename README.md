@@ -6,7 +6,8 @@ Production-ready ad service with Google AdSense/AdMob integration, comprehensive
 
 ## 🚀 Quick Start
 
-👉 **See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions**
+👉 **See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions**  
+👉 **See [DEPLOYMENT.md](DEPLOYMENT.md) for deploying to public domain with frp**
 
 ### Option 1: Mock Mode (No Google Ads Setup Required) ⚡
 
@@ -448,6 +449,32 @@ CG_ad_service/
 ```
 
 ## 🚀 Production Deployment
+
+### Deployment Options
+
+#### Option 1: Local Development with frp (Recommended for Testing Real Ads)
+
+Deploy your local service to public internet using frp for Google AdSense testing:
+
+👉 **See [DEPLOYMENT.md](DEPLOYMENT.md) for complete frp deployment guide**
+
+**Quick setup:**
+```powershell
+# 1. Start local ad service
+npm run dev
+
+# 2. In a new terminal, start frp client
+frpc -c frpc.toml
+
+# 3. Access via public domain
+# http://ym.test.classguruai.com:12280/demo/demo.html
+```
+
+**Public URLs:**
+- Demo: `http://ym.test.classguruai.com:12280/demo/demo.html`
+- API: `http://ym.test.classguruai.com:12280/api/ads/*`
+
+#### Option 2: Production Server Deployment
 
 ### Pre-Deployment Checklist
 - [ ] **Disable mock mode**: Set `MOCK_ADS_MODE=false`
