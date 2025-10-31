@@ -8,6 +8,7 @@ import { logger } from './lib/logger.js';
 import { initDatabase, closeDatabase } from './lib/database.js';
 import { initGoogleAds } from './lib/google-ads.js';
 import { registerAdRoutes } from './routes/index.js';
+import { registerRequestId } from './middleware/request-id.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -48,6 +49,12 @@ async function startServer(): Promise<void> {
         root: frontendPath,
         prefix: '/demo/',
       });
+      // Also expose under /public/ for compatibility
+      await fastify.register(fastifyStatic, {
+        root: frontendPath,
+        prefix: '/public/',
+        decorateReply: false,
+      });
       logger.info('Static files registered', { path: frontendPath });
     } catch (error) {
       logger.warn('Failed to register static files', { error, path: frontendPath });
@@ -55,6 +62,7 @@ async function startServer(): Promise<void> {
     }
 
     // Register routes
+    registerRequestId(fastify);
     await registerAdRoutes(fastify);
 
     // Root endpoint

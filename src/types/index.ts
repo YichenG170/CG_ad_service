@@ -17,6 +17,7 @@ export interface AdUnit {
 export interface AdImpression {
   id: string;
   adUnitId: string;
+  provider?: string;
   userId?: string;
   sessionId: string;
   timestamp: Date;
@@ -32,6 +33,7 @@ export interface AdClick {
   id: string;
   impressionId: string;
   adUnitId: string;
+  provider?: string;
   userId?: string;
   sessionId: string;
   timestamp: Date;
@@ -95,8 +97,18 @@ export interface AdResponse {
     content: string;
     clickUrl?: string;
     impressionId: string;
+    provider?: string;
+    viewabilityToken?: string;
   };
+  skipReason?: 'premium_user' | 'has_credits';
   error?: string;
+}
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: { code: string; message: string } | null;
+  requestId: string;
 }
 
 export interface HealthCheckResponse {

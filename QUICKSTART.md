@@ -51,7 +51,7 @@ npm start
 
 Open in your browser:
 - **Home**: http://localhost:8791
-- **Demo Page**: http://localhost:8791/demo/demo.html
+- **Demo Page**: http://localhost:8791/demo/demo.html (also at http://localhost:8791/public/demo.html)
 - **Health Check**: http://localhost:8791/api/ads/health
 
 ---

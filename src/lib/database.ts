@@ -31,6 +31,8 @@ export async function initDatabase(): Promise<void> {
 
     // Create tables
     await createTables();
+    // Migrate schema to latest
+    await migrateSchema();
     
     logger.info('Database initialized successfully');
   } catch (error) {
@@ -67,6 +69,7 @@ async function createTables(): Promise<void> {
     CREATE TABLE IF NOT EXISTS ad_impressions (
       id TEXT PRIMARY KEY,
       ad_unit_id TEXT NOT NULL,
+      provider TEXT DEFAULT 'google',
       user_id TEXT,
       session_id TEXT NOT NULL,
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -86,6 +89,7 @@ async function createTables(): Promise<void> {
       id TEXT PRIMARY KEY,
       impression_id TEXT NOT NULL,
       ad_unit_id TEXT NOT NULL,
+      provider TEXT DEFAULT 'google',
       user_id TEXT,
       session_id TEXT NOT NULL,
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -107,6 +111,55 @@ async function createTables(): Promise<void> {
   `);
 
   logger.info('Database tables created successfully');
+}
+
+async function migrateSchema(): Promise<void> {
+  if (!db) throw new Error('Database not initialized');
+  try {
+    const columnsImpr = await db.all<{ name: string }[]>(`PRAGMA table_info(ad_impressions)`);
+    const hasProviderImpr = columnsImpr.some(c => c.name === 'provider');
+    if (!hasProviderImpr) {
+      await db.exec(`ALTER TABLE ad_impressions ADD COLUMN provider TEXT DEFAULT 'google'`);
+    }
+  } catch (e) {
+    logger.warn('Migration: ad_impressions provider column add may have failed', { error: e });
+  }
+
+  try {
+    const columnsClick = await db.all<{ name: string }[]>(`PRAGMA table_info(ad_clicks)`);
+    const hasProviderClick = columnsClick.some(c => c.name === 'provider');
+    if (!hasProviderClick) {
+      await db.exec(`ALTER TABLE ad_clicks ADD COLUMN provider TEXT DEFAULT 'google'`);
+    }
+  } catch (e) {
+    logger.warn('Migration: ad_clicks provider column add may have failed', { error: e });
+  }
+
+  try {
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS ad_providers (
+        id TEXT PRIMARY KEY,
+        display_name TEXT NOT NULL,
+        weight INTEGER DEFAULT 100,
+        active INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS provider_revenue_daily (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        provider TEXT NOT NULL,
+        date DATE NOT NULL,
+        gross_revenue REAL NOT NULL DEFAULT 0,
+        currency TEXT DEFAULT 'USD',
+        source_ref TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (provider, date)
+      )
+    `);
+  } catch (e) {
+    logger.warn('Migration: provider tables creation may have failed', { error: e });
+  }
 }
 
 /**

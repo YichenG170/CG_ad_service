@@ -23,6 +23,7 @@ interface AdRequestBody {
 interface ClickTrackingBody {
   impressionId: string;
   clickUrl: string;
+  viewabilityToken?: string;
 }
 
 interface MetricsQuery {
@@ -129,15 +130,31 @@ export async function registerAdRoutes(fastify: FastifyInstance): Promise<void> 
           userId,
         };
 
-        const adResponse = await handleAdRequest(adRequest, userId);
+        // Extract JWT token if available for credits check
+        const token = authHeader ? extractToken(authHeader) : undefined;
+        const adResponse = await handleAdRequest(adRequest, userId, token);
 
-        reply.send(adResponse);
+        const requestId = (request as any).requestId || '';
+        if (adResponse.success) {
+          if (adResponse.skipReason) {
+            // User skipped ads (premium or has credits)
+            reply.send({ 
+              success: true, 
+              data: null, 
+              skipReason: adResponse.skipReason,
+              requestId 
+            });
+          } else {
+            // Normal ad response
+            reply.send({ success: true, data: adResponse.ad, requestId });
+          }
+        } else {
+          reply.code(500).send({ success: false, error: adResponse.error, requestId });
+        }
       } catch (error) {
         logger.error('Failed to request ad', { error });
-        reply.code(500).send({
-          success: false,
-          error: 'Internal server error',
-        });
+        const requestId = (request as any).requestId || '';
+        reply.code(500).send({ success: false, error: 'Internal server error', requestId });
       }
     }
   );
@@ -169,15 +186,24 @@ export async function registerAdRoutes(fastify: FastifyInstance): Promise<void> 
           }
         }
 
-        const result = await handleAdClick(impressionId, clickUrl, userId);
+        const result = await handleAdClick(
+          impressionId,
+          clickUrl,
+          userId,
+          request.body.viewabilityToken,
+          request.headers.authorization
+        );
 
-        reply.send(result);
+        const requestId = (request as any).requestId || '';
+        if (result.success) {
+          reply.send({ success: true, data: {}, requestId });
+        } else {
+          reply.code(400).send({ success: false, error: result.error || 'Click failed', requestId });
+        }
       } catch (error) {
         logger.error('Failed to track click', { error });
-        reply.code(500).send({
-          success: false,
-          error: 'Internal server error',
-        });
+        const requestId = (request as any).requestId || '';
+        reply.code(500).send({ success: false, error: 'Internal server error', requestId });
       }
     }
   );

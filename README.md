@@ -76,6 +76,8 @@ npm start
 ```bash
 # Open demo page
 open http://localhost:8791/demo
+# Also available at
+open http://localhost:8791/public/demo.html
 
 # Or test API directly
 curl -X POST http://localhost:8791/api/ads/request \
@@ -182,6 +184,10 @@ ADSENSE_SLOT_ID=xxxxxxxxxx
 
 # Mock Mode (for development)
 MOCK_ADS_MODE=false
+
+# Credits (Phase-1 preview; disabled by default)
+CREDITS_ON_CLICK_ENABLED=false
+AD_CREDIT_RATIO=1
 ```
 
 ### Google AdSense Setup

@@ -39,6 +39,29 @@ export const AD_CONFIG = {
     enabled: process.env.MOCK_ADS_MODE === 'true',
     scenario: process.env.MOCK_ADS_SCENARIO || 'success',
   },
+
+  // Dynamic provider selection
+  providers: (process.env.PROVIDER_LIST || 'google').split(',').map(p => p.trim()).filter(Boolean),
+  providerWeights: (process.env.PROVIDER_WEIGHTS || '')
+    .split(',')
+    .map(kv => kv.trim())
+    .filter(Boolean)
+    .reduce<Record<string, number>>((acc, kv) => {
+      const [k, v] = kv.split(':');
+      if (k && v && !Number.isNaN(Number(v))) acc[k] = Number(v);
+      return acc;
+    }, {}),
+
+  // Credits configuration (disabled by default; enable via env)
+  creditsOnClickEnabled: (process.env.CREDITS_ON_CLICK_ENABLED || 'false') === 'true',
+  creditRatio: parseFloat(process.env.AD_CREDIT_RATIO || '1'),
+  creditConversionParam: parseFloat(process.env.CREDIT_CONVERSION_PARAM || '1'),
+
+  // Anti-abuse toggles
+  featureFlags: (process.env.ADS_FEATURE_FLAGS || '').split(',').map(f => f.trim()).filter(Boolean),
+  minDisplayMs: parseInt(process.env.AD_MIN_DISPLAY_MS || '5000', 10),
+  clickRateLimit: process.env.CLICK_RATE_LIMIT || '20/min',
+  clickDedupeWindowMs: parseInt(process.env.CLICK_DEDUPE_WINDOW_MS || '5000', 10),
 } as const;
 
 export const GOOGLE_ADS_CONFIG = {
@@ -52,4 +75,9 @@ export const GOOGLE_ADS_CONFIG = {
     appId: process.env.ADMOB_APP_ID || '',
     bannerUnitId: process.env.ADMOB_BANNER_UNIT_ID || '',
   },
+} as const;
+
+export const AFFILIATE_CONFIG = {
+  apiKey: process.env.AFFILIATE_API_KEY || '',
+  baseUrl: process.env.AFFILIATE_BASE_URL || '',
 } as const;
